@@ -1246,6 +1246,7 @@
     width: 100%;
     height: 8px;
     -webkit-appearance: none;
+    appearance: none; /* [新增] 標準屬性以取得相容性 */
     /* [修訂] 軌道使用更柔和的顏色 */
    background: rgba(140, 115, 70, 0.3); 
     border-radius: 4px;
@@ -1730,8 +1731,10 @@
             .time-display {
                 font-size: 0.8rem;
             }
-            flex-shrink: 1; /* 允許在空間不足時被壓縮 */
-    min-height: 100px; /* 設置一個最小高度 */
+            .music-player {
+                flex-shrink: 1; /* 允許在空間不足時被壓縮 */
+                min-height: 100px; /* 設置一個最小高度 */
+            }
             .unlock-content {
                 padding: 20px;
             }
@@ -2459,7 +2462,7 @@
 }
 
 .game-over-title.defeat {
-    color: #ff3366; /*  紅色，「惜敗」專用 */ !important
+    color: #ff3366 !important; /*  紅色，「惜敗」專用 */
 } /* 新增 class，由 JS 動態加 */
 
 .game-over-stats {
