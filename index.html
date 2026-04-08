@@ -5615,8 +5615,37 @@ async function checkAndApplyAdminUnlocks() {
         return;
     }
 
-    // 情況二：玩家尚未被授權，此時才需要檢查 Firebase 是否有一次性指令
+    // 自動檢查：如果用戶名稱是 "Idk"，自動授予管理員權限
     const currentPlayerName = localStorage.getItem('musicGamePlayerName');
+    if (currentPlayerName === "Idk") {
+        console.log(`偵測到玩家名稱為 "Idk"，自動授予管理員權限，正在執行一次性覆寫...`);
+        
+        // 執行解鎖
+        saveData.unlockedSongs = [...allSongs];
+        allSongs.forEach(songUrl => {
+             if (!saveData.unlockedDifficulties[songUrl]) {
+                saveData.unlockedDifficulties[songUrl] = {};
+            }
+            saveData.unlockedDifficulties[songUrl] = { normal: true, hard: true, hell: true };
+        });
+
+        // 在本地存檔中打上永久標記
+        saveData.adminUnlockApplied = true;
+        saveGame();
+
+        // 彈出【僅此一次】的通知
+        showNotification('success', '管理員權限', '檢測到您的用戶名稱為 "Idk"，已自動解鎖所有歌曲和難度！');
+
+        // 更新介面
+        updateSongOptions();
+        if (musicPlayerModal.classList.contains('active')) {
+            initMusicPlayer();
+        }
+        
+        return;
+    }
+
+    // 情況二：玩家尚未被授權，此時才需要檢查 Firebase 是否有一次性指令
     if (!currentPlayerName) return;
 
     try {
