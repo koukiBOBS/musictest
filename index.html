@@ -9173,6 +9173,7 @@ disclaimerModal.addEventListener('click', (e) => {
         if (isNaN(ms)) ms = 3000;
         ms = Math.min(6000, Math.max(300, ms));
         window.noteSpeed = ms;
+        noteSpeed = ms; // 确保全局noteSpeed同步
         updateSpeedDisplay();
     }
 
@@ -9194,6 +9195,7 @@ disclaimerModal.addEventListener('click', (e) => {
         newMs = Math.min(6000, Math.max(300, newMs));
         if (window.noteSpeed === newMs) return;
         window.noteSpeed = newMs;
+        noteSpeed = newMs; // 同步全局noteSpeed
         saveNoteSpeed();
         updateSpeedDisplay();
         if (showToast && typeof showNotification === 'function') {
@@ -9204,6 +9206,12 @@ disclaimerModal.addEventListener('click', (e) => {
             } else {
                 showNotification('success', '流速已更新', `音符下落速度系数 = ${speedFactorMsg} (数值越大越快)`);
             }
+        }
+        // 更新现有音符的动画时长
+        if (window.gameActive) {
+            document.querySelectorAll('.note, .long-note').forEach(el => {
+                el.style.animationDuration = `${window.noteSpeed}ms`;
+            });
         }
     }
 
@@ -9239,7 +9247,10 @@ disclaimerModal.addEventListener('click', (e) => {
     const modal = document.getElementById('settingsModal');
     if (modal) {
         const observer = new MutationObserver(() => {
-            if (modal.classList.contains('active')) updateSpeedDisplay();
+            if (modal.classList.contains('active')) {
+                updateSpeedDisplay();
+                bindSpeedButtons();
+            }
         });
         observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
     }
