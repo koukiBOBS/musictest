@@ -6419,8 +6419,12 @@ async function submitScoreToLeaderboard(songUrl, difficulty, finalScore) {
     note.dataset.track = trackIndex;
     note.style.animationDuration = `${noteSpeed}ms`;
     if (noteData.type === 'long') {
-        const noteHeight = (noteData.duration / (noteSpeed / 1000)) * (tracksContainer.clientHeight + 50);
-        note.style.height = `${Math.max(30, noteHeight)}px`;
+        // 【修正】长音符高度应基于时长和下落距离的比例
+        const totalFallDistance = tracksContainer.clientHeight + 50;
+        const noteSpeedSeconds = noteSpeed / 1000;
+        const pixelsPerSecond = totalFallDistance / noteSpeedSeconds;
+        const noteHeight = Math.max(30, noteData.duration * pixelsPerSecond);
+        note.style.height = `${noteHeight}px`;
     }
     track.appendChild(note);
     const noteObj = {
@@ -8406,12 +8410,16 @@ function resetToMainMenu() {
         return;
     }
 
+    // 【修正】動態計算pixelsPerMillisecond，確保流速變化時同步更新
+    const totalFallDistance = tracksContainer.clientHeight + 50;
+    const currentPixelsPerMillisecond = totalFallDistance / noteSpeed;
+
     for (let i = notes.length - 1; i >= 0; i--) {
         const note = notes[i];
         if (!note.active) continue;
 
         const timeElapsed = now - note.creationTime;
-        const noteTopY = (timeElapsed * pixelsPerMillisecond) - 50;
+        const noteTopY = (timeElapsed * currentPixelsPerMillisecond) - 50;
 
         if (noteTopY > hitLineY + 20) {
             const isTrackInvincible = notes.some(n =>
