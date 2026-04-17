@@ -8478,6 +8478,7 @@ function resetToMainMenu() {
     else judgment = 'good';
     if (hitNote.type === 'long') {
         hitNote.hitStarted = true;
+        hitNote.hitStartTime = Date.now();
         hitNote.element.classList.add('held');
         judgeHit(trackIndex, judgment);
         explodeNote(hitNote.element, judgment); // 新增：長音符按下時分解粒子
@@ -8520,23 +8521,27 @@ function resetToMainMenu() {
             const hitLineY = trackRect.top + trackRect.height - 100;
             const rect = note.element.getBoundingClientRect();
             const noteTailY = rect.top;
-            const distance = Math.abs(noteTailY - hitLineY);
+            const heldTime = Date.now() - (note.hitStartTime || 0);
+            const requiredHold = (note.duration || 0) * 1000;
             let type = 'miss';  // 預設為 MISS
-if (distance < 50) {
-    if (distance < 15) type = 'perfect';
-    else if (distance < 30) type = 'great';
-    else type = 'good';
-}
 
-// 修訂：無論 MISS 或非 MISS，都呼叫 judgeHit，讓它處理所有效果（包括粒子/震動）
-judgeHit(trackIndex, type);
-if (type !== 'miss') {
-    explodeNote(note.element, type); // 新增：長音符釋放成功時分解粒子
-}
+            // 長音符釋放判定：必須至少持續到它的時長，且尾部接近判定線
+            if (heldTime >= Math.max(0, requiredHold - 150)) {
+                const distance = Math.abs(noteTailY - hitLineY);
+                if (distance < 15) type = 'perfect';
+                else if (distance < 30) type = 'great';
+                else if (distance < 50) type = 'good';
+            }
 
-note.active = false;
-note.element.remove();
-notes.splice(heldNoteIndex, 1);
+            // 修訂：無論 MISS 或非 MISS，都呼叫 judgeHit，讓它處理所有效果（包括粒子/震動）
+            judgeHit(trackIndex, type);
+            if (type !== 'miss') {
+                explodeNote(note.element, type); // 新增：長音符釋放成功時分解粒子
+            }
+
+            note.active = false;
+            note.element.remove();
+            notes.splice(heldNoteIndex, 1);
         }
     }
 }
