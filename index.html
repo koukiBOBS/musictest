@@ -8419,8 +8419,19 @@ function resetToMainMenu() {
         const note = notes[i];
         if (!note.active) continue;
 
-        const timeElapsed = now - note.creationTime;
-        const noteTopY = (timeElapsed * currentPixelsPerMillisecond) - 50;
+        const rect = note.element.getBoundingClientRect();
+        const noteTopY = rect.top;
+        const noteBottomY = rect.bottom;
+
+        if (note.type === 'long' && note.hitStarted) {
+            // 如果長音符已經開始按住，則等到尾部真正超過判定線後再移除。
+            if (noteBottomY > hitLineY + 20) {
+                note.active = false;
+                note.element.remove();
+                notes.splice(i, 1);
+            }
+            continue;
+        }
 
         if (noteTopY > hitLineY + 20) {
             const isTrackInvincible = notes.some(n =>
