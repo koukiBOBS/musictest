@@ -524,7 +524,6 @@
             width: 70px;
             background: linear-gradient(45deg, #ff416c, #ff4b2b);
             border-radius: 12px; /* Reduced radius */
-            top: -50px;
             left: 5px;
             box-shadow: 0 0 10px rgba(255, 65, 108, 0.7); /* Reduced shadow */
             animation: fall linear;
@@ -6425,6 +6424,8 @@ async function submitScoreToLeaderboard(songUrl, difficulty, finalScore) {
         const pixelsPerSecond = totalFallDistance / noteSpeedSeconds;
         const noteHeight = Math.max(30, noteData.duration * pixelsPerSecond);
         note.style.height = `${noteHeight}px`;
+        // 【修正】长音符初始位置应考虑其高度，确保从头开始就可见
+        note.style.top = `-${50 + noteHeight}px`;
     }
     track.appendChild(note);
     const noteObj = {
