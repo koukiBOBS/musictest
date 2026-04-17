@@ -8520,7 +8520,7 @@ function resetToMainMenu() {
             const trackRect = tracksContainer.getBoundingClientRect();
             const hitLineY = trackRect.top + trackRect.height - 100;
             const rect = note.element.getBoundingClientRect();
-            const noteTailY = rect.top;
+            const noteTailY = rect.bottom;
             const heldTime = Date.now() - (note.hitStartTime || 0);
             const requiredHold = (note.duration || 0) * 1000;
             let type = 'miss';  // 預設為 MISS
