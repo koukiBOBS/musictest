@@ -8520,12 +8520,12 @@ function resetToMainMenu() {
             const trackRect = tracksContainer.getBoundingClientRect();
             const hitLineY = trackRect.top + trackRect.height - 100;
             const rect = note.element.getBoundingClientRect();
-            const noteTailY = rect.bottom;
+            const noteTailY = rect.top;
             const heldTime = Date.now() - (note.hitStartTime || 0);
             const requiredHold = (note.duration || 0) * 1000;
             let type = 'miss';  // 預設為 MISS
 
-            // 長音符釋放判定：必須至少持續到它的時長，且尾部接近判定線
+            // 長音符釋放判定：必須至少持續到它的時長，且尾部（note 頂端）接近判定線
             if (heldTime >= Math.max(0, requiredHold - 150)) {
                 const distance = Math.abs(noteTailY - hitLineY);
                 if (distance < 15) type = 'perfect';
